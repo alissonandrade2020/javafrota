@@ -7,4 +7,5 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Long> {
  @Query("select v from Veiculo v where (:q = '' or lower(v.marca) like lower(concat('%',:q,'%')) or lower(v.modelo) like lower(concat('%',:q,'%')) or lower(v.placa) like lower(concat('%',:q,'%'))) and (:status = '' or v.status = :status) order by v.id desc")
  List<Veiculo> pesquisar(@Param("q") String q, @Param("status") String status);
  long countByStatus(String status);
+ boolean existsByPlaca(String placa);
 }

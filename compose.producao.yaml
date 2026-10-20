@@ -19,6 +19,7 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-frota_producao}
       DB_USER: ${DB_USER:-frota}
       DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      FROTA_SEED_ENABLED: ${FROTA_SEED_ENABLED:-false}
     depends_on: {db: {condition: service_healthy}}
     restart: unless-stopped
   frontend:

@@ -12,11 +12,12 @@ Projeto de portfólio para gestão de frota: API REST Java 21/Spring Boot, front
 ## 1. O que está incluído
 
 - Backend: Java 21, Spring Boot, Spring Data JPA, validação e API REST.
-- Frontend: React 19 + Vite 6 + TypeScript, painel responsivo de veículos.
+- Frontend: React 19 + Vite 6 + TypeScript, Redux Toolkit, serviços de API e componentes de gestão responsivos com visualização isométrica 3D.
 - Banco de dados: PostgreSQL 17.
 - Containers: Docker Compose.
 - CI/CD: GitHub Actions, testes/build, publicação de imagens no GitHub Container Registry (GHCR), deploy de homologação e promoção manual para produção.
-- Funcionalidades: painel de totais, pesquisa, filtro por status, cadastro, edição, exclusão e exportação CSV.
+- Funcionalidades: painel gerencial por área, frota, proprietários, funcionários/RH, estoque de peças, ordens de serviço, vendas e relatórios com exportação CSV.
+- Ordens de serviço: problemas do veículo, diagnóstico, peças e quantidades, mão de obra e total a pagar; o estoque é atualizado ao salvar a ordem.
 
 ## 2. Instale as ferramentas no Windows
 
@@ -111,7 +112,7 @@ Teste a listagem:
 Invoke-RestMethod http://localhost:8080/api/veiculos
 ```
 
-Se ainda não cadastrou veículos, uma lista vazia é normal. Para cadastrar um registro de teste pela API:
+Com `FROTA_SEED_ENABLED=true` (padrão local/homologação), a API inclui dados de demonstração: proprietários, funcionários, peças, ordens de serviço, vendas e veículos de combustão, diesel, híbridos e elétricos. A carga não substitui os dados existentes; veículos de exemplo são inseridos quando a placa ainda não existe. A produção mantém a carga desligada por padrão. Um exemplo de ordem incluída é um Onix batido, com capô amassado e farol esquerdo quebrado: capô R$ 700 + farol R$ 300 + mão de obra R$ 800 = **R$ 1.800**. Confira no painel **Manutenção** e em **Relatórios**. Para cadastrar outro veículo pela API:
 
 ```powershell
 $body = @{
@@ -191,6 +192,9 @@ docker compose logs -f frontend
 
 # Reconstruir após alterações
 docker compose up --build -d
+
+# Reconstruir somente a API e a interface após alterações nesses módulos
+docker compose up --build -d backend frontend
 
 # Parar serviços, mantendo os dados
 docker compose down
@@ -432,8 +436,16 @@ Rollback dos containers não desfaz mudanças no schema do banco. Faça backup e
 | `POST` | `/api/veiculos` | Cadastra veículo |
 | `PUT` | `/api/veiculos/{id}` | Atualiza veículo |
 | `DELETE` | `/api/veiculos/{id}` | Exclui veículo |
+| `GET/POST` | `/api/proprietarios` | Lista/cadastra proprietários |
+| `GET/POST` | `/api/funcionarios` | Lista/cadastra funcionários e perfis |
+| `GET/POST` | `/api/pecas` | Lista/cadastra peças e estoque |
+| `GET/POST` | `/api/manutencoes` | Lista/cadastra ordens de serviço com itens e mão de obra |
+| `GET/POST` | `/api/vendas` | Lista/cadastra vendas |
+| `GET` | `/api/relatorios/resumo?de=AAAA-MM-DD&ate=AAAA-MM-DD` | Indicadores e relatórios por período |
 
 Status aceitos: `ATIVO`, `MANUTENCAO`, `INATIVO`. A placa usa formato Mercosul, por exemplo `ABC1D23`, e deve ser única.
+
+Para aplicar alterações do código depois de atualizá-lo, execute `docker compose up --build -d backend frontend` na raiz. O Compose recria os containers necessários mantendo o volume do PostgreSQL. Não é preciso executar `down`; não use `down -v`, pois ele apaga o banco local.
 
 ## 15. Segurança antes de usar em produção real
 
