@@ -9,3 +9,38 @@
 @media(max-width:1150px){.management-grid{grid-template-columns:1fr 1fr}.field-card{grid-column:1/-1}.fleet-visual{height:90px}}
 @media(max-width:650px){.management-panel{margin-bottom:20px}.management-heading{align-items:flex-start;gap:10px}.management-period{font-size:0;padding:7px}.management-grid{grid-template-columns:1fr}.field-card{grid-column:auto}.management-card{padding:14px}.field-card{display:grid;grid-template-columns:1fr 120px;align-items:center}.field-card .management-card-title{grid-column:1}.field-card .fleet-visual{grid-column:2;grid-row:1/3;width:125px;margin:0}.field-card .field-summary{grid-column:1/-1;margin-top:6px}.management-foot{font-size:7px}.availability-content{margin:12px 0 9px}}
 @media(prefers-reduced-motion:reduce){.availability-bar span{transition:none}}
+
+/* Refinamento da tabela de veículos e visualização das fotos */
+.vehicle-section{overflow:hidden;border:1px solid #e5e9f2;border-radius:16px;background:#fff;box-shadow:0 12px 34px #202d4610}
+.section-heading{padding:22px 23px 18px}
+.table-toolbar{padding:13px 20px;background:linear-gradient(180deg,#fff,#fcfcff)}
+.table-wrap{overflow-x:auto}
+.vehicle-section table{width:100%;border-collapse:separate;border-spacing:0}
+.vehicle-section thead th{padding:12px 13px;background:#f8f9fc;color:#8994a8;font-size:8px;letter-spacing:.9px}
+.vehicle-section tbody td{padding:13px;border-bottom:1px solid #f0f2f6;transition:background .18s}
+.vehicle-section tbody tr:hover td{background:#fafaff}
+.vehicle-section tbody tr:last-child td{border-bottom:0}
+.vehicle-cell{gap:12px}
+.vehicle-cell strong{font-size:11px;color:#27334a}
+.vehicle-cell span{font-size:9px}
+.vehicle-avatar{flex:none;height:48px;width:64px;overflow:hidden;border:1px solid #e8ebf2;border-radius:10px;background:linear-gradient(145deg,#f3f4fa,#e8ebf4);font-size:11px;color:#7770c6}
+.vehicle-avatar.has-photo{padding:0;cursor:zoom-in;transition:transform .18s,box-shadow .18s,border-color .18s}
+.vehicle-avatar.has-photo:hover{transform:translateY(-1px) scale(1.04);border-color:#b9b1ff;box-shadow:0 5px 15px #5348bd25}
+.vehicle-avatar img{height:100%;width:100%;object-fit:cover;display:block}
+.vehicle-avatar:disabled{cursor:default;opacity:1}
+.plate-tag{padding:6px 8px;border-radius:6px;background:#f8f9fc;font-size:9px}
+.status-badge{padding:6px 9px;border-radius:999px}
+.row-actions{opacity:.85}
+.photo-viewer-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:22px;background:#101629c9;backdrop-filter:blur(9px);animation:fade-in .18s}
+.photo-viewer{position:relative;width:min(900px,94vw);overflow:hidden;border:1px solid #ffffff35;border-radius:18px;background:#fff;box-shadow:0 30px 100px #080d1a80;animation:modal-in .2s}
+.photo-viewer>img{display:block;width:100%;max-height:min(68vh,680px);object-fit:contain;background:linear-gradient(140deg,#f5f6fa,#e9ecf3)}
+.photo-viewer-close{position:absolute;top:12px;right:12px;z-index:1;display:grid;place-items:center;width:38px;height:38px;border:1px solid #ffffff80;border-radius:11px;background:#ffffffed;color:#364056;box-shadow:0 5px 20px #11182722}
+.photo-viewer-caption{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 21px}
+.photo-viewer-caption>div{display:grid;gap:4px}
+.photo-viewer-caption>div>span{color:#8278dd;font-size:8px;font-weight:800;letter-spacing:1.1px}
+.photo-viewer-caption strong{color:#27334a;font:800 15px Manrope,sans-serif}
+.photo-viewer-caption small{color:#909bad;font-size:10px}
+@media(max-width:600px){.vehicle-section{border-radius:12px}.vehicle-avatar{width:58px;height:44px}.photo-viewer-backdrop{padding:12px}.photo-viewer{width:100%;border-radius:13px}.photo-viewer-caption{padding:13px 15px}.photo-viewer-caption strong{font-size:13px}}
+.vehicle-avatar{position:relative}
+.vehicle-avatar>span{position:absolute;inset:0;display:grid;place-items:center;z-index:0}
+.vehicle-avatar img{position:relative;z-index:1}
