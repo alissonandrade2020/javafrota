@@ -20,6 +20,8 @@ services:
       DB_USER: ${DB_USER:-frota}
       DB_PASSWORD: ${DB_PASSWORD:-frota_dev_change_me}
       FROTA_SEED_ENABLED: ${FROTA_SEED_ENABLED:-true}
+      MASTER_EMAIL: ${MASTER_EMAIL:-admin@frotaflow.local}
+      MASTER_PASSWORD: ${MASTER_PASSWORD:-FrotaFlow@2026!}
     depends_on: {db: {condition: service_healthy}}
     ports: ["127.0.0.1:${API_PORT:-8080}:8080"]
     restart: unless-stopped

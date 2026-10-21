@@ -22,7 +22,7 @@ public class Veiculo {
     private Boolean recargaExterna = false;
     private Integer autonomiaEletricaKm;
     @Column(length=180) private String fonteImagem;
-    @ManyToOne(fetch = FetchType.EAGER) @JoinColumn(name = "proprietario_id") private Proprietario proprietario;
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "proprietario_id") private Proprietario proprietario;
     @Column(nullable = false, updatable = false) private Instant criadoEm = Instant.now();
     protected Veiculo() {}
     public Veiculo(String marca, String modelo, Integer ano, String placa, String status) {

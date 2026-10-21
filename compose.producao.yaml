@@ -20,6 +20,9 @@ services:
       DB_USER: ${DB_USER:-frota}
       DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
       FROTA_SEED_ENABLED: ${FROTA_SEED_ENABLED:-false}
+      MASTER_EMAIL: ${MASTER_EMAIL:?Defina MASTER_EMAIL}
+      MASTER_PASSWORD: ${MASTER_PASSWORD:?Defina MASTER_PASSWORD com no mínimo 12 caracteres}
+      SESSION_COOKIE_SECURE: "true"
     depends_on: {db: {condition: service_healthy}}
     restart: unless-stopped
   frontend:

@@ -12,6 +12,8 @@ Projeto de portfólio para gestão de frota: API REST Java 21/Spring Boot, front
 ## 1. O que está incluído
 
 - Backend: Java 21, Spring Boot, Spring Data JPA, validação e API REST.
+- Segurança: Spring Security com sessão, proteção CSRF, perfis por função e senha armazenada com BCrypt.
+- Banco de dados: migrações Flyway versionadas e validação do esquema pelo Hibernate.
 - Frontend: React 19 + Vite 6 + TypeScript, Redux Toolkit, serviços de API e componentes de gestão responsivos com visualização isométrica 3D.
 - Banco de dados: PostgreSQL 17.
 - Containers: Docker Compose.
@@ -57,6 +59,8 @@ Altere `DB_PASSWORD` para uma senha de desenvolvimento local, salve e feche. Exe
 DB_NAME=frota
 DB_USER=frota
 DB_PASSWORD=coloque_uma_senha_local_forte
+MASTER_EMAIL=admin@frotaflow.local
+MASTER_PASSWORD=uma_senha_local_com_12_caracteres
 APP_PORT=4200
 API_PORT=8080
 ```
@@ -106,10 +110,16 @@ Resposta esperada:
 }
 ```
 
-Teste a listagem:
+As rotas de negócio da API agora exigem uma sessão autenticada. Inicie o frontend pela seção 6 e entre com a conta master antes de consultar veículos. No Docker local, a conta inicial padrão é `admin@frotaflow.local` / `FrotaFlow@2026!`; defina `MASTER_EMAIL` e `MASTER_PASSWORD` no `.env` para substituir esses valores de desenvolvimento. Não reutilize essas credenciais em homologação ou produção.
+
+Para testar a API protegida diretamente, crie uma sessão PowerShell e obtenha o token CSRF antes do login:
 
 ```powershell
-Invoke-RestMethod http://localhost:8080/api/veiculos
+$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$csrf = Invoke-RestMethod 'http://localhost:8080/api/auth/csrf' -WebSession $session
+$login = @{ email = 'admin@frotaflow.local'; senha = 'FrotaFlow@2026!' } | ConvertTo-Json
+Invoke-RestMethod 'http://localhost:8080/api/auth/login' -Method Post -ContentType 'application/json' -Body $login -WebSession $session -Headers @{'X-XSRF-TOKEN' = $csrf.token}
+Invoke-RestMethod 'http://localhost:8080/api/veiculos' -WebSession $session
 ```
 
 Com `FROTA_SEED_ENABLED=true` (padrão local/homologação), a API inclui dados de demonstração: proprietários, funcionários, peças, ordens de serviço, vendas e veículos de combustão, diesel, híbridos e elétricos. A carga não substitui os dados existentes; veículos de exemplo são inseridos quando a placa ainda não existe. A produção mantém a carga desligada por padrão. Um exemplo de ordem incluída é um Onix batido, com capô amassado e farol esquerdo quebrado: capô R$ 700 + farol R$ 300 + mão de obra R$ 800 = **R$ 1.800**. Confira no painel **Manutenção** e em **Relatórios**. Para cadastrar outro veículo pela API:
@@ -166,7 +176,7 @@ Abra no navegador:
 
 - **Aplicação completa:** http://localhost:4200
 - **Saúde da API diretamente:** http://localhost:8080/api/health
-- **Lista de veículos diretamente:** http://localhost:8080/api/veiculos
+- **Lista de veículos:** disponível após login, dentro da plataforma
 
 Na interface, teste busca, filtro de status, cadastro, edição, exclusão e exportação CSV. Se a página abrir mas não carregar os dados, veja os logs:
 
@@ -231,6 +241,8 @@ Pré-requisitos: JDK 21 e Maven instalados.
    $env:DB_URL = 'jdbc:postgresql://localhost:5432/frota'
    $env:DB_USER = 'frota'
    $env:DB_PASSWORD = 'coloque_a_mesma_senha_do_env'
+   $env:MASTER_EMAIL = 'admin@frotaflow.local'
+   $env:MASTER_PASSWORD = 'defina_uma_senha_com_12_caracteres'
    mvn spring-boot:run
    ```
 
@@ -387,6 +399,8 @@ No GitHub, abra **Settings → Environments** e crie os ambientes com os nomes e
 | `DEPLOY_USER` | Usuário SSH de deploy |
 | `DEPLOY_SSH_KEY` | Chave privada SSH autorizada no servidor |
 | `DB_PASSWORD` | Senha exclusiva do PostgreSQL desse ambiente |
+| `MASTER_EMAIL` | E-mail da conta Administrador Master |
+| `MASTER_PASSWORD` | Senha inicial forte da conta Master (mínimo de 12 caracteres) |
 | `GHCR_USER` | Usuário GitHub que pode baixar os pacotes |
 | `GHCR_TOKEN` | Token com permissão `read:packages` |
 

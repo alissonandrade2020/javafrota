@@ -81,20 +81,24 @@ jobs:
           USER: ${{ secrets.DEPLOY_USER }}
           KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: test -n "$HOST" && test -n "$USER" && test -n "$KEY" && test -n "$PASSWORD"
+          MASTER_EMAIL: ${{ secrets.MASTER_EMAIL }}
+          MASTER_PASSWORD: ${{ secrets.MASTER_PASSWORD }}
+        run: test -n "$HOST" && test -n "$USER" && test -n "$KEY" && test -n "$PASSWORD" && test -n "$MASTER_EMAIL" && test -n "$MASTER_PASSWORD"
       - name: Deploy remoto com SSH
         uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE_TAG: ${{ needs.build-and-publish.outputs.tag }}
           IMAGE_OWNER: ${{ needs.build-and-publish.outputs.owner }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MASTER_EMAIL: ${{ secrets.MASTER_EMAIL }}
+          MASTER_PASSWORD: ${{ secrets.MASTER_PASSWORD }}
           GHCR_USER: ${{ secrets.GHCR_USER }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          envs: IMAGE_TAG,IMAGE_OWNER,DB_PASSWORD,GHCR_USER,GHCR_TOKEN
+          envs: IMAGE_TAG,IMAGE_OWNER,DB_PASSWORD,MASTER_EMAIL,MASTER_PASSWORD,GHCR_USER,GHCR_TOKEN
           script: |
             set -eu
             cd /opt/frota/homolog
@@ -102,6 +106,7 @@ jobs:
             export BACKEND_IMAGE="ghcr.io/$IMAGE_OWNER/frota-api:$IMAGE_TAG"
             export FRONTEND_IMAGE="ghcr.io/$IMAGE_OWNER/frota-web:$IMAGE_TAG"
             export DB_PASSWORD
+            export MASTER_EMAIL MASTER_PASSWORD
             docker compose -f compose.homolog.yaml pull
             docker compose -f compose.homolog.yaml up -d --remove-orphans
             for i in $(seq 1 30); do if curl -fsS http://127.0.0.1:8081/api/health >/dev/null; then exit 0; fi; sleep 5; done
@@ -125,13 +130,15 @@ jobs:
           IMAGE_TAG: ${{ inputs.image_tag }}
           IMAGE_OWNER: ${{ github.repository_owner }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MASTER_EMAIL: ${{ secrets.MASTER_EMAIL }}
+          MASTER_PASSWORD: ${{ secrets.MASTER_PASSWORD }}
           GHCR_USER: ${{ secrets.GHCR_USER }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          envs: IMAGE_TAG,IMAGE_OWNER,DB_PASSWORD,GHCR_USER,GHCR_TOKEN
+          envs: IMAGE_TAG,IMAGE_OWNER,DB_PASSWORD,MASTER_EMAIL,MASTER_PASSWORD,GHCR_USER,GHCR_TOKEN
           script: |
             set -eu
             cd /opt/frota/producao
@@ -140,6 +147,7 @@ jobs:
             export BACKEND_IMAGE="ghcr.io/$IMAGE_OWNER/frota-api:$IMAGE_TAG"
             export FRONTEND_IMAGE="ghcr.io/$IMAGE_OWNER/frota-web:$IMAGE_TAG"
             export DB_PASSWORD
+            export MASTER_EMAIL MASTER_PASSWORD
             docker compose -f compose.producao.yaml pull
             docker compose -f compose.producao.yaml up -d --remove-orphans
             for i in $(seq 1 30); do if curl -fsS http://127.0.0.1:8080/api/health >/dev/null; then exit 0; fi; sleep 5; done
